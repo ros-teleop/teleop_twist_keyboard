@@ -56,9 +56,14 @@ def vels(speed,turn):
 	return "currently:\tspeed %s\tturn %s " % (speed,turn)
 
 if __name__=="__main__":
-    	settings = termios.tcgetattr(sys.stdin)
-	
-	pub = rospy.Publisher('cmd_vel', Twist)
+    settings = termios.tcgetattr(sys.stdin)
+
+    topic_name = 'cmd_vel'
+    if len(sys.argv) == 2:
+        topic_name = sys.argv[1]
+
+
+	pub = rospy.Publisher(topic_name, Twist)
 	rospy.init_node('teleop_twist_keyboard')
 
 	x = 0
