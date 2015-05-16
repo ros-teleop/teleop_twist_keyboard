@@ -58,8 +58,10 @@ def vels(speed,turn):
 if __name__=="__main__":
     	settings = termios.tcgetattr(sys.stdin)
 	
-	pub = rospy.Publisher('cmd_vel', Twist)
-	rospy.init_node('teleop_twist_keyboard')
+	robot_name = sys.argv[1] if len(sys.argv) > 1 else ''
+	pub = rospy.Publisher(robot_name + '/cmd_vel', Twist)
+	node_name = robot_name + '_teleop_twist_keyboard' if robot_name != '' else 'teleop_twist_keyboard'
+	rospy.init_node(node_name)
 
 	x = 0
 	th = 0
