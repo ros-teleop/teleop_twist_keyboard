@@ -19,18 +19,37 @@ w/x : increase/decrease only linear speed by 10%
 e/c : increase/decrease only angular speed by 10%
 anything else : stop
 
+For Holonomic mode (strafing), hold down the shift key:
+ U  I  O
+ J  K  L
+ M  <  >
+
+For vertical movement, use t for up and b for down, at the same speed.
+
+Holonomic mode and vertical mode both use the linear speed setting.
+
 CTRL-C to quit
 """
 
 moveBindings = {
-		'i':(1,0,0),
-		'o':(1,0,-1),
-		'j':(0,0,1),
-		'l':(0,0,-1),
-		'u':(1,0,1),
-		',':(-1,0,0),
-		'.':(-1,0,1),
-		'm':(-1,0,-1),
+		'i':(1,0,0,0),
+		'o':(1,0,0,-1),
+		'j':(0,0,0,1),
+		'l':(0,0,0,-1),
+		'u':(1,0,0,1),
+		',':(-1,0,0,0),
+		'.':(-1,0,0,1),
+		'm':(-1,0,0,-1),
+		'O':(1,-1,0,0),
+		'I':(1,0,0,0),
+		'J':(0,1,0,0),
+		'L':(0,-1,0,0),
+		'U':(1,1,0,0),
+		'<':(-1,0,0,0),
+		'>':(-1,-1,0,0),
+		'M':(-1,1,0,0),
+		't':(0,0,1,0),
+		'b':(0,0,-1,0),
 	       }
 
 speedBindings={
@@ -63,6 +82,7 @@ if __name__=="__main__":
 
 	x = 0
 	y = 0
+	z = 0
 	th = 0
 	status = 0
 
@@ -74,7 +94,8 @@ if __name__=="__main__":
 			if key in moveBindings.keys():
 				x = moveBindings[key][0]
 				y = moveBindings[key][1]
-				th = moveBindings[key][2]
+				z = moveBindings[key][2]
+				th = moveBindings[key][3]
 			elif key in speedBindings.keys():
 				speed = speed * speedBindings[key][0]
 				turn = turn * speedBindings[key][1]
@@ -86,12 +107,13 @@ if __name__=="__main__":
 			else:
 				x = 0
 				y = 0
+				z = 0
 				th = 0
 				if (key == '\x03'):
 					break
 
 			twist = Twist()
-			twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = 0
+			twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = z*speed;
 			twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = th*turn
 			pub.publish(twist)
 
