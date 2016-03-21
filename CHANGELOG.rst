@@ -1,5 +1,5 @@
-Forthcoming
------------
+0.6.0 (2016-03-21)
+------------------
 * Better instruction formatting
 * support holonomic base, send commmand with keyboard down
 * Fixing queue_size warning
