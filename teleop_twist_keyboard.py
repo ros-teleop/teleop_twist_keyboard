@@ -79,8 +79,8 @@ if __name__=="__main__":
 	pub = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
 	rospy.init_node('teleop_twist_keyboard')
 
-        speed = rospy.get_param("~speed", 0.5)
-        turn = rospy.get_param("~turn", 1.0)
+	speed = rospy.get_param("~speed", 0.5)
+	turn = rospy.get_param("~turn", 1.0)
 	x = 0
 	y = 0
 	z = 0
