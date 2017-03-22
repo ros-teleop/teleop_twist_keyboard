@@ -119,8 +119,6 @@ if __name__=="__main__":
 					twist.linear.x  = twist.linear.x/2;	twist.linear.y  = twist.linear.y/2;	twist.linear.z  = twist.linear.z/2;	twist.angular.z = twist.angular.z/2;
 					rospy.sleep(.1)
 					twist.linear.x  = 0.0;	twist.linear.y  = 0.0;	twist.linear.z  = 0.0;	twist.angular.z = 0.0;
-					print 'why'
-			   		print twist
 					pub.publish(twist)
 				
 
