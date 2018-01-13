@@ -118,7 +118,7 @@ if __name__=="__main__":
 			twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = th*turn
 			pub.publish(twist)
 
-	except:
+	except Exception as e:
 		print e
 
 	finally:
