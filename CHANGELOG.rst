@@ -1,3 +1,16 @@
+Forthcoming
+-----------
+* Merge pull request `#11 <https://github.com/ros-teleop/teleop_twist_keyboard/issues/11>`_ from MatthijsBurgh/patch-1
+  Correct exception handling; Python3 print compatible
+* import print from future
+* Print python3 compatible
+* correct Exception handling
+* Merge pull request `#7 <https://github.com/ros-teleop/teleop_twist_keyboard/issues/7>`_ from lucasw/speed_params
+  set linear and turn speed via rosparams
+* Using tabs instead of spaces to match rest of file
+* set linear and turn speed via rosparams
+* Contributors: Austin, Lucas Walter, Matthijs van der Burgh
+
 0.6.0 (2016-03-21)
 ------------------
 * Better instruction formatting
