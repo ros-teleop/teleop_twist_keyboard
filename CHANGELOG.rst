@@ -1,5 +1,5 @@
-Forthcoming
------------
+0.6.1 (2018-05-02)
+------------------
 * Merge pull request `#11 <https://github.com/ros-teleop/teleop_twist_keyboard/issues/11>`_ from MatthijsBurgh/patch-1
   Correct exception handling; Python3 print compatible
 * import print from future
