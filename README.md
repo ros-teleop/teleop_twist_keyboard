@@ -1,9 +1,18 @@
 # teleop_twist_keyboard
 Generic Keyboard Teleop for ROS
-#Launch
-To run: `rosrun teleop_twist_keyboard teleop_twist_keyboard.py`
 
-#Usage
+# Launch
+Run.
+```
+rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+```
+
+With custom values.
+```
+rosrun teleop_twist_keyboard teleop_twist_keyboard.py _speed:=0.9 _turn:=0.8
+```
+
+# Usage
 ```
 Reading from the keyboard  and Publishing to Twist!
 ---------------------------
