@@ -1,0 +1,25 @@
+<?xml version="1.0"?>
+<package format="2">
+  <name>teleop_twist_keyboard_cpp</name>
+  <version>0.0.0</version>
+  <description>Generic keyboard teleop for twist robots (in C++)! Based off of the teleop_twist_keyboard Python ROS node.</description>
+
+  <author email="methyldragon@gmail.com">methylDragon</author>
+  <maintainer email="methyldragon@gmail.com">methylDragon</maintainer>
+  <url type="website">http://github.com/methylDragon</url>
+  <url>http://www.ros.org/wiki/teleop_twist_keyboard_cpp</url>
+
+  <license>MIT</license>
+
+  <buildtool_depend>catkin</buildtool_depend>
+
+  <build_depend>roscpp</build_depend>
+  <build_depend>geometry_msgs</build_depend>
+
+  <build_export_depend>roscpp</build_export_depend>
+  <build_export_depend>geometry_msgs</build_export_depend>
+
+  <exec_depend>roscpp</exec_depend>
+  <exec_depend>geometry_msgs</exec_depend>
+  
+</package>
