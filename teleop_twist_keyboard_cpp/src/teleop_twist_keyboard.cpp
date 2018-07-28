@@ -14,8 +14,8 @@ std::map<char, std::vector<float>> moveBindings
   {'o', {1, 0, 0, -1}},
   {'j', {0, 0, 0, 1}},
   {'l', {0, 0, 0, -1}},
-  {'u', {-1, 0, 0, 0}},
-  {',', {-1, 0, 0, 1}},
+  {'u', {1, 0, 0, 1}},
+  {',', {-1, 0, 0, 0}},
   {'.', {-1, 0, 0, 1}},
   {'m', {-1, 0, 0, -1}},
   {'O', {1, -1, 0, 0}},
@@ -31,7 +31,6 @@ std::map<char, std::vector<float>> moveBindings
   {'k', {0, 0, 0, 0}},
   {'K', {0, 0, 0, 0}}
 };
-
 
 // Map for speed keys
 std::map<char, std::vector<float>> speedBindings
