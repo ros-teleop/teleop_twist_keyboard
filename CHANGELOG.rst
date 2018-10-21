@@ -1,5 +1,5 @@
-Forthcoming
------------
+0.6.2 (2018-10-21)
+------------------
 * Replace tabs with spaces, fixes `#15 <https://github.com/ros-teleop/teleop_twist_keyboard/issues/15>`_
 * Merge pull request `#13 <https://github.com/ros-teleop/teleop_twist_keyboard/issues/13>`_ from asukiaaa/patch-3
   Add rosrun command to specify values
