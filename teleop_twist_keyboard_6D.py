@@ -101,8 +101,8 @@ if __name__=="__main__":
     pub = rospy.Publisher('CartesianVelocityMove', TwistStamped, queue_size = 1)
     rospy.init_node('teleop_twist_keyboard')
 
-    speed = rospy.get_param("~speed", 0.005)
-    turn = rospy.get_param("~turn", 0.1)
+    speed = rospy.get_param("~speed", 0.01)
+    turn = rospy.get_param("~turn", 0.05)
     x = 0
     y = 0
     z = 0
