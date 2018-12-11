@@ -5,12 +5,12 @@ from __future__ import print_function
 import roslib; roslib.load_manifest('teleop_twist_keyboard')
 import rospy
 
-from geometry_msgs.msg import Twist
+from geometry_msgs.msg import Twist, TwistStamped
 
 import sys, select, termios, tty
 
 msg = """
-Reading from the keyboard  and Publishing to Twist!
+Reading from the keyboard  and Publishing to TwistStamped!
 ---------------------------
 Moving around:
    u    i    o
@@ -98,7 +98,7 @@ def vels(speed,turn):
 if __name__=="__main__":
     settings = termios.tcgetattr(sys.stdin)
 
-    pub = rospy.Publisher('CartesianVelocityMove', Twist, queue_size = 1)
+    pub = rospy.Publisher('CartesianVelocityMove', TwistStamped, queue_size = 1)
     rospy.init_node('teleop_twist_keyboard')
 
     speed = rospy.get_param("~speed", 0.005)
@@ -144,7 +144,9 @@ if __name__=="__main__":
             twist = Twist()
             twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = z*speed;
             twist.angular.x = roll*turn; twist.angular.y = pitch*turn; twist.angular.z = yaw*turn
-            pub.publish(twist)
+            twist_pub = TwistStamped()
+            twist_pub.twist = twist
+            pub.publish(twist_pub)
 
     except Exception as e:
         print(e)
@@ -153,6 +155,8 @@ if __name__=="__main__":
         twist = Twist()
         twist.linear.x = 0; twist.linear.y = 0; twist.linear.z = 0
         twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
-        pub.publish(twist)
+        twist_pub = TwistStamped()
+        twist_pub.twist = twist
+        pub.publish(twist_pub)
 
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
