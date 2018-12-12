@@ -30,6 +30,15 @@ For Holonomic mode (strafing), hold down the shift key:
 t : up (+z)
 b : down (-z)
 
+For Orientation mode:
+---------------------------
+        8     
+   4    5    6
+        2    
+
+7 : roll left (-x)
+9 : roll right (+x)
+
 anything else : stop
 
 q/z : increase/decrease max speeds by 10%

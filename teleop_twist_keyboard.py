@@ -26,6 +26,15 @@ For Holonomic mode (strafing), hold down the shift key:
 t : up (+z)
 b : down (-z)
 
+For Orientation mode:
+---------------------------
+        8     
+   4    5    6
+        2    
+
+7 : roll left (-x)
+9 : roll right (+x)
+
 anything else : stop
 
 q/z : increase/decrease max speeds by 10%
@@ -36,24 +45,34 @@ CTRL-C to quit
 """
 
 moveBindings = {
-        'i':(1,0,0,0),
-        'o':(1,0,0,-1),
-        'j':(0,0,0,1),
-        'l':(0,0,0,-1),
-        'u':(1,0,0,1),
-        ',':(-1,0,0,0),
-        '.':(-1,0,0,1),
-        'm':(-1,0,0,-1),
-        'O':(1,-1,0,0),
-        'I':(1,0,0,0),
-        'J':(0,1,0,0),
-        'L':(0,-1,0,0),
-        'U':(1,1,0,0),
-        '<':(-1,0,0,0),
-        '>':(-1,-1,0,0),
-        'M':(-1,1,0,0),
-        't':(0,0,1,0),
-        'b':(0,0,-1,0),
+        # [Translation] Basic moving mode 
+        'i':(1,0,0,0,0,0),
+        'o':(1,0,0,0,0,-1),
+        'j':(0,0,0,0,0,1),
+        'l':(0,0,0,0,0,-1),
+        'u':(1,0,0,0,0,1),
+        ',':(-1,0,0,0,0,0),
+        '.':(-1,0,0,0,0,1),
+        'm':(-1,0,0,0,0,-1),
+        # [Translation] Holonomic moving mode
+        'O':(1,-1,0,0,0,0),
+        'I':(1,0,0,0,0,0),
+        'J':(0,1,0,0,0,0),
+        'L':(0,-1,0,0,0,0),
+        'U':(1,1,0,0,0,0),
+        '<':(-1,0,0,0,0,0),
+        '>':(-1,-1,0,0,0,0),
+        'M':(-1,1,0,0,0,0),
+        # [Translation] height change
+        't':(0,0,1,0,0,0),
+        'b':(0,0,-1,0,0,0),
+        # [Orientation]
+        '8':(0,0,0,0,1,0),
+        '2':(0,0,0,0,-1,0),
+        '4':(0,0,0,0,0,1),
+        '6':(0,0,0,0,0,-1),
+        '7':(0,0,0,-1,0,0),
+        '9':(0,0,0,1,0,0),         
     }
 
 speedBindings={
@@ -87,7 +106,9 @@ if __name__=="__main__":
     x = 0
     y = 0
     z = 0
-    th = 0
+    roll = 0
+    pitch = 0
+    yaw = 0
     status = 0
 
     try:
@@ -99,7 +120,9 @@ if __name__=="__main__":
                 x = moveBindings[key][0]
                 y = moveBindings[key][1]
                 z = moveBindings[key][2]
-                th = moveBindings[key][3]
+                roll = moveBindings[key][3]
+                pitch = moveBindings[key][4]
+                yaw = moveBindings[key][5]
             elif key in speedBindings.keys():
                 speed = speed * speedBindings[key][0]
                 turn = turn * speedBindings[key][1]
@@ -112,13 +135,15 @@ if __name__=="__main__":
                 x = 0
                 y = 0
                 z = 0
-                th = 0
+                roll = 0
+                pitch = 0
+                yaw = 0
                 if (key == '\x03'):
                     break
 
             twist = Twist()
             twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = z*speed;
-            twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = th*turn
+            twist.angular.x = roll*turn; twist.angular.y = pitch*turn; twist.angular.z = yaw*turn
             pub.publish(twist)
 
     except Exception as e:
