@@ -108,6 +108,9 @@ if __name__=="__main__":
                 if (status == 14):
                     print(msg)
                 status = (status + 1) % 15
+
+                # Don't publish a twist while changing the speed
+                continue
             else:
                 x = 0
                 y = 0
