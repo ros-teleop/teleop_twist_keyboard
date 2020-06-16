@@ -87,9 +87,17 @@ class PublishThread(threading.Thread):
             self.timeout = 1.0 / rate
         else:
             self.timeout = None
-        print("Rate: {}, timeout: {}".format(rate, self.timeout))
 
         self.start()
+
+    def wait_for_subscribers(self):
+        i = 0
+        while self.publisher.get_num_connections() == 0:
+            if i == 4:
+                print("Waiting for subscriber to connect to {}".format(self.publisher.name))
+            rospy.sleep(0.5)
+            i += 1
+            i = i % 5
 
     def update(self, x, y, z, th, speed, turn):
         with self.lock:
@@ -169,6 +177,9 @@ if __name__=="__main__":
     th = 0
     status = 0
 
+    pub_thread.wait_for_subscribers()
+    pub_thread.update(x, y, z, th, speed, turn)
+
     try:
         print(msg)
         print(vels(speed,turn))
@@ -188,6 +199,10 @@ if __name__=="__main__":
                     print(msg)
                 status = (status + 1) % 15
             else:
+                # Skip updating cmd_vel if key timeout and robot already
+                # stopped.
+                if key == '' and x == 0 and y == 0 and z == 0 and th == 0:
+                    continue
                 x = 0
                 y = 0
                 z = 0
