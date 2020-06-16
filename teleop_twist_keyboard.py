@@ -77,8 +77,7 @@ class PublishThread(threading.Thread):
         self.th = 0.0
         self.speed = 0.0
         self.turn = 0.0
-        self.lock = threading.Lock()
-        self.new_message = threading.Event()
+        self.condition = threading.Condition()
         self.done = False
 
         # Set timeout to None if rate is 0 (causes new_message to wait forever
@@ -102,37 +101,40 @@ class PublishThread(threading.Thread):
             raise Exception("Got shutdown request before subscribers connected")
 
     def update(self, x, y, z, th, speed, turn):
-        with self.lock:
-            self.x = x
-            self.y = y
-            self.z = z
-            self.th = th
-            self.speed = speed
-            self.turn = turn
+        self.condition.acquire()
+        self.x = x
+        self.y = y
+        self.z = z
+        self.th = th
+        self.speed = speed
+        self.turn = turn
         # Notify publish thread that we have a new message.
-        self.new_message.set()
+        self.condition.notify()
+        self.condition.release()
 
     def stop(self):
         self.done = True
-        self.new_message.set()
+        self.update(0, 0, 0, 0, 0, 0)
         self.join()
 
     def run(self):
         twist = Twist()
         while not self.done:
+            self.condition.acquire()
             # Wait for a new message or timeout.
-            self.new_message.wait(self.timeout)
-            self.new_message.clear()
+            self.condition.wait(self.timeout)
+
+            # Copy state into twist message.
+            twist.linear.x = self.x * self.speed
+            twist.linear.y = self.y * self.speed
+            twist.linear.z = self.z * self.speed
+            twist.angular.x = 0
+            twist.angular.y = 0
+            twist.angular.z = self.th * self.turn
+
+            self.condition.release()
 
             # Publish.
-            with self.lock:
-                twist.linear.x = self.x * self.speed
-                twist.linear.y = self.y * self.speed
-                twist.linear.z = self.z * self.speed
-                twist.angular.x = 0
-                twist.angular.y = 0
-                twist.angular.z = self.th * self.turn
-
             self.publisher.publish(twist)
 
         # Publish stop message when thread exits.
