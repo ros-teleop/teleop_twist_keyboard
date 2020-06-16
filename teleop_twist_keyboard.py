@@ -2,6 +2,8 @@
 
 from __future__ import print_function
 
+import threading
+
 import roslib; roslib.load_manifest('teleop_twist_keyboard')
 import rospy
 
@@ -65,25 +67,97 @@ speedBindings={
         'c':(1,.9),
     }
 
-def getKey():
+class PublishThread(threading.thread):
+    def __init__(self, rate):
+        self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
+        self.x = 0.0
+        self.y = 0.0
+        self.z = 0.0
+        self.th = 0.0
+        self.speed = 0.0
+        self.turn = 0.0
+        self.lock = threading.Lock()
+        self.new_message = threading.Event()
+        self.done = False
+
+        # Set timeout to None if rate is 0 (causes new_message to wait forever
+        # for new data to publish)
+        if rate != 0.0:
+            self.timeout = 1.0 / rate
+        else:
+            self.timeout = None
+
+    def update(self, x, y, z, th, speed, turn):
+        with self.lock:
+            self.x = x
+            self.y = y
+            self.z = z
+            self.th = th
+            self.speed = speed
+            self.turn = turn
+        # Notify publish thread that we have a new message.
+        self.new_message.set()
+
+    def stop(self):
+        self.done = True
+        self.join()
+
+    def run(self):
+        twist = Twist()
+        while not self.done:
+            # Wait for a new message or timeout.
+            self.new_message.wait(self.timeout)
+            self.new_message.clear()
+
+            # Publish.
+            with self.lock:
+                twist.linear.x = self.x * self.speed
+                twist.linear.y = self.y * self.speed
+                twist.linear.z = self.z * self.speed
+                twist.angular.x = 0
+                twist.angular.y = 0
+                twist.angular.z = self.th * self.turn
+
+            self.publisher.publish(twist)
+            print("Publish", twist)
+
+        # Publish stop message when thread exits.
+        twist.linear.x = 0
+        twist.linear.y = 0
+        twist.linear.z = 0
+        twist.angular.x = 0
+        twist.angular.y = 0
+        twist.angular.z = 0
+        self.publisher.publish(twist)
+        print("Publish", twist)
+
+
+def getKey(key_timeout):
     tty.setraw(sys.stdin.fileno())
-    select.select([sys.stdin], [], [], 0)
-    key = sys.stdin.read(1)
+    rlist, _, _ = select.select([sys.stdin], [], [], key_timeout)
+    if rlist:
+        key = sys.stdin.read(1)
+    else:
+        key = ''
     termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
     return key
 
 
-def vels(speed,turn):
+def vels(speed, turn):
     return "currently:\tspeed %s\tturn %s " % (speed,turn)
 
 if __name__=="__main__":
     settings = termios.tcgetattr(sys.stdin)
 
-    pub = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
     rospy.init_node('teleop_twist_keyboard')
 
     speed = rospy.get_param("~speed", 0.5)
     turn = rospy.get_param("~turn", 1.0)
+    repeat = rospy.get_param("~repeat_rate", 0.0)
+    key_timeout = rospy.get_param("~key_timeout", 0.0)
+
+    pub_thread = PublisherThread(repeat)
+
     x = 0
     y = 0
     z = 0
@@ -94,7 +168,7 @@ if __name__=="__main__":
         print(msg)
         print(vels(speed,turn))
         while(1):
-            key = getKey()
+            key = getKey(key_timeout)
             if key in moveBindings.keys():
                 x = moveBindings[key][0]
                 y = moveBindings[key][1]
@@ -115,19 +189,13 @@ if __name__=="__main__":
                 th = 0
                 if (key == '\x03'):
                     break
-
-            twist = Twist()
-            twist.linear.x = x*speed; twist.linear.y = y*speed; twist.linear.z = z*speed;
-            twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = th*turn
-            pub.publish(twist)
+ 
+            pub_thread.update(x, y, z, th, speed, turn)
 
     except Exception as e:
         print(e)
 
     finally:
-        twist = Twist()
-        twist.linear.x = 0; twist.linear.y = 0; twist.linear.z = 0
-        twist.angular.x = 0; twist.angular.y = 0; twist.angular.z = 0
-        pub.publish(twist)
+        pub_thread.stop()
 
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
