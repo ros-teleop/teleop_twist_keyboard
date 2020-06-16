@@ -92,12 +92,14 @@ class PublishThread(threading.Thread):
 
     def wait_for_subscribers(self):
         i = 0
-        while self.publisher.get_num_connections() == 0:
+        while not rospy.is_shutdown() and self.publisher.get_num_connections() == 0:
             if i == 4:
                 print("Waiting for subscriber to connect to {}".format(self.publisher.name))
             rospy.sleep(0.5)
             i += 1
             i = i % 5
+        if rospy.is_shutdown():
+            raise Exception("Got shutdown request before subscribers connected")
 
     def update(self, x, y, z, th, speed, turn):
         with self.lock:
@@ -177,10 +179,10 @@ if __name__=="__main__":
     th = 0
     status = 0
 
-    pub_thread.wait_for_subscribers()
-    pub_thread.update(x, y, z, th, speed, turn)
-
     try:
+        pub_thread.wait_for_subscribers()
+        pub_thread.update(x, y, z, th, speed, turn)
+
         print(msg)
         print(vels(speed,turn))
         while(1):
