@@ -67,8 +67,9 @@ speedBindings={
         'c':(1,.9),
     }
 
-class PublishThread(threading.thread):
+class PublishThread(threading.Thread):
     def __init__(self, rate):
+        super(PublishThread, self).__init__()
         self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
         self.x = 0.0
         self.y = 0.0
@@ -86,6 +87,9 @@ class PublishThread(threading.thread):
             self.timeout = 1.0 / rate
         else:
             self.timeout = None
+        print("Rate: {}, timeout: {}".format(rate, self.timeout))
+
+        self.start()
 
     def update(self, x, y, z, th, speed, turn):
         with self.lock:
@@ -100,6 +104,7 @@ class PublishThread(threading.thread):
 
     def stop(self):
         self.done = True
+        self.new_message.set()
         self.join()
 
     def run(self):
@@ -119,7 +124,6 @@ class PublishThread(threading.thread):
                 twist.angular.z = self.th * self.turn
 
             self.publisher.publish(twist)
-            print("Publish", twist)
 
         # Publish stop message when thread exits.
         twist.linear.x = 0
@@ -129,7 +133,6 @@ class PublishThread(threading.thread):
         twist.angular.y = 0
         twist.angular.z = 0
         self.publisher.publish(twist)
-        print("Publish", twist)
 
 
 def getKey(key_timeout):
@@ -155,8 +158,10 @@ if __name__=="__main__":
     turn = rospy.get_param("~turn", 1.0)
     repeat = rospy.get_param("~repeat_rate", 0.0)
     key_timeout = rospy.get_param("~key_timeout", 0.0)
+    if key_timeout == 0.0:
+        key_timeout = None
 
-    pub_thread = PublisherThread(repeat)
+    pub_thread = PublishThread(repeat)
 
     x = 0
     y = 0
