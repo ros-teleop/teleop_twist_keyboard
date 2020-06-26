@@ -1,3 +1,9 @@
+Forthcoming
+-----------
+* Implement repeat rate and key timeout
+* Update readme about publishing to another topic.
+* Contributors: Austin, trainman419
+
 0.6.2 (2018-10-21)
 ------------------
 * Replace tabs with spaces, fixes `#15 <https://github.com/ros-teleop/teleop_twist_keyboard/issues/15>`_
