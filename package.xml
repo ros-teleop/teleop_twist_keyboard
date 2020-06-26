@@ -1,7 +1,7 @@
 <?xml version="1.0"?>
 <package>
   <name>teleop_twist_keyboard</name>
-  <version>0.6.2</version>
+  <version>1.0.0</version>
   <description>Generic keyboard teleop for twist robots.</description>
 
   <maintainer email="namniart@gmail.com">Austin Hendrix</maintainer>

@@ -1,5 +1,5 @@
-Forthcoming
------------
+1.0.0 (2020-06-26)
+------------------
 * Implement repeat rate and key timeout
 * Update readme about publishing to another topic.
 * Contributors: Austin, trainman419
