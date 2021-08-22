@@ -11,6 +11,13 @@ from geometry_msgs.msg import Twist
 
 import sys, select, termios, tty
 
+have_termios = False
+try:
+    import termios
+    have_termios = True
+except ImportError:
+    pass
+
 msg = """
 Reading from the keyboard  and Publishing to Twist!
 ---------------------------
@@ -154,7 +161,8 @@ def getKey(key_timeout):
         key = sys.stdin.read(1)
     else:
         key = ''
-    termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+    if have_termios:
+        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
     return key
 
 
@@ -162,7 +170,8 @@ def vels(speed, turn):
     return "currently:\tspeed %s\tturn %s " % (speed,turn)
 
 if __name__=="__main__":
-    settings = termios.tcgetattr(sys.stdin)
+    if have_termios:
+        settings = termios.tcgetattr(sys.stdin)
 
     rospy.init_node('teleop_twist_keyboard')
 
@@ -222,4 +231,5 @@ if __name__=="__main__":
     finally:
         pub_thread.stop()
 
-        termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
+        if have_termios:
+            termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
