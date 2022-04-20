@@ -129,8 +129,6 @@ class PublishThread(threading.Thread):
 
     def run(self):
         twist_msg = TwistMsg()
-        print("Twist type: " + str(type(twist_msg)))
-        print("stamped: " + str(stamped))
 
         if stamped:
             twist = twist_msg.twist
