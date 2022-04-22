@@ -8,6 +8,7 @@ import roslib; roslib.load_manifest('teleop_twist_keyboard')
 import rospy
 
 from geometry_msgs.msg import Twist
+from geometry_msgs.msg import TwistStamped
 
 import sys, select
 
@@ -18,6 +19,7 @@ else:
     import tty
 
 
+TwistMsg = Twist
 
 msg = """
 Reading from the keyboard  and Publishing to Twist!
@@ -78,7 +80,7 @@ speedBindings={
 class PublishThread(threading.Thread):
     def __init__(self, rate):
         super(PublishThread, self).__init__()
-        self.publisher = rospy.Publisher('cmd_vel', Twist, queue_size = 1)
+        self.publisher = rospy.Publisher('cmd_vel', TwistMsg, queue_size = 1)
         self.x = 0.0
         self.y = 0.0
         self.z = 0.0
@@ -126,8 +128,17 @@ class PublishThread(threading.Thread):
         self.join()
 
     def run(self):
-        twist = Twist()
+        twist_msg = TwistMsg()
+
+        if stamped:
+            twist = twist_msg.twist
+            twist_msg.header.stamp = rospy.Time.now()
+            twist_msg.header.frame_id = twist_frame
+        else:
+            twist = twist_msg
         while not self.done:
+            if stamped:
+                twist_msg.header.stamp = rospy.Time.now()
             self.condition.acquire()
             # Wait for a new message or timeout.
             self.condition.wait(self.timeout)
@@ -143,7 +154,7 @@ class PublishThread(threading.Thread):
             self.condition.release()
 
             # Publish.
-            self.publisher.publish(twist)
+            self.publisher.publish(twist_msg)
 
         # Publish stop message when thread exits.
         twist.linear.x = 0
@@ -152,7 +163,7 @@ class PublishThread(threading.Thread):
         twist.angular.x = 0
         twist.angular.y = 0
         twist.angular.z = 0
-        self.publisher.publish(twist)
+        self.publisher.publish(twist_msg)
 
 
 def getKey(settings):
@@ -188,6 +199,10 @@ if __name__=="__main__":
     turn = rospy.get_param("~turn", 1.0)
     repeat = rospy.get_param("~repeat_rate", 0.0)
     key_timeout = rospy.get_param("~key_timeout", 0.0)
+    stamped = rospy.get_param("~stamped", False)
+    twist_frame = rospy.get_param("~frame_id", '')
+    if stamped:
+        TwistMsg = TwistStamped
     if key_timeout == 0.0:
         key_timeout = None
 
