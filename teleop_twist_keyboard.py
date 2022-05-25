@@ -199,6 +199,7 @@ if __name__=="__main__":
     settings = saveTerminalSettings()
 
     rospy.init_node('teleop_twist_keyboard')
+
     speed = rospy.get_param("~speed", 0.5)
     turn = rospy.get_param("~turn", 1.0)
     repeat = rospy.get_param("~repeat_rate", 0.0)
@@ -209,6 +210,7 @@ if __name__=="__main__":
         TwistMsg = TwistStamped
 
     pub_thread = PublishThread(repeat)
+
     x = 0
     y = 0
     z = 0
