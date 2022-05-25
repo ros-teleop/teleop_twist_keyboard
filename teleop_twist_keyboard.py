@@ -10,7 +10,8 @@ import rospy
 from geometry_msgs.msg import Twist
 from geometry_msgs.msg import TwistStamped
 
-import sys, select
+import sys
+from select import select
 
 if sys.platform == 'win32':
     import msvcrt
@@ -166,14 +167,18 @@ class PublishThread(threading.Thread):
         self.publisher.publish(twist_msg)
 
 
-def getKey(settings):
+def getKey(settings, timeout):
     if sys.platform == 'win32':
         # getwch() returns a string on Windows
         key = msvcrt.getwch()
     else:
         tty.setraw(sys.stdin.fileno())
         # sys.stdin.read() returns a string on Linux
-        key = sys.stdin.read(1)
+        rlist, _, _ = select([sys.stdin], [], [], timeout)
+        if rlist:
+            key = sys.stdin.read(1)
+        else:
+            key = ''
         termios.tcsetattr(sys.stdin, termios.TCSADRAIN, settings)
     return key
 
@@ -194,20 +199,16 @@ if __name__=="__main__":
     settings = saveTerminalSettings()
 
     rospy.init_node('teleop_twist_keyboard')
-
     speed = rospy.get_param("~speed", 0.5)
     turn = rospy.get_param("~turn", 1.0)
     repeat = rospy.get_param("~repeat_rate", 0.0)
-    key_timeout = rospy.get_param("~key_timeout", 0.0)
+    key_timeout = rospy.get_param("~key_timeout", 0.5)
     stamped = rospy.get_param("~stamped", False)
     twist_frame = rospy.get_param("~frame_id", '')
     if stamped:
         TwistMsg = TwistStamped
-    if key_timeout == 0.0:
-        key_timeout = None
 
     pub_thread = PublishThread(repeat)
-
     x = 0
     y = 0
     z = 0
@@ -221,7 +222,7 @@ if __name__=="__main__":
         print(msg)
         print(vels(speed,turn))
         while(1):
-            key = getKey(settings)
+            key = getKey(settings, key_timeout)
             if key in moveBindings.keys():
                 x = moveBindings[key][0]
                 y = moveBindings[key][1]
@@ -246,7 +247,7 @@ if __name__=="__main__":
                 th = 0
                 if (key == '\x03'):
                     break
- 
+
             pub_thread.update(x, y, z, th, speed, turn)
 
     except Exception as e:
@@ -255,4 +256,3 @@ if __name__=="__main__":
     finally:
         pub_thread.stop()
         restoreTerminalSettings(settings)
-
