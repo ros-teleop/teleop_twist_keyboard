@@ -202,6 +202,8 @@ if __name__=="__main__":
 
     speed = rospy.get_param("~speed", 0.5)
     turn = rospy.get_param("~turn", 1.0)
+    speed_limit = rospy.get_param("~speed_limit", 1000)
+    turn_limit = rospy.get_param("~turn_limit", 1000)
     repeat = rospy.get_param("~repeat_rate", 0.0)
     key_timeout = rospy.get_param("~key_timeout", 0.5)
     stamped = rospy.get_param("~stamped", False)
@@ -231,9 +233,12 @@ if __name__=="__main__":
                 z = moveBindings[key][2]
                 th = moveBindings[key][3]
             elif key in speedBindings.keys():
-                speed = speed * speedBindings[key][0]
-                turn = turn * speedBindings[key][1]
-
+                speed = min(speed_limit, speed * speedBindings[key][0])
+                turn = min(turn_limit, turn * speedBindings[key][1])
+                if speed == speed_limit:
+                    print("Linear speed limit reached!")
+                if turn == turn_limit:
+                    print("Angular speed limit reached!")
                 print(vels(speed,turn))
                 if (status == 14):
                     print(msg)
