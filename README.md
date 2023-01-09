@@ -1,4 +1,4 @@
-# teleop_twist_keyboard
+# teleop_twist_keyboard [deprecated, to be deleted]
 Generic Keyboard Teleop for ROS
 
 # Launch
