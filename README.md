@@ -6,7 +6,10 @@ Run.
 ```
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 ```
-
+Run with radio control
+```
+rosrun teleop_twist_keyboard radio_twist_keyboard.py
+```
 With custom values.
 ```
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py _speed:=0.9 _turn:=0.8
