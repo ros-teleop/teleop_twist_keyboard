@@ -247,7 +247,7 @@ if __name__=="__main__":
                 # Skip updating cmd_vel if key timeout and robot already
                 # stopped.
                 if key == '' and x == 0 and y == 0 and z == 0 and th == 0:
-                    continue
+                    pass
                 x = 0
                 y = 0
                 z = 0
